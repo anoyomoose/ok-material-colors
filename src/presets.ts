@@ -24,6 +24,13 @@ export interface SchemeConfig {
 
   errorHue: number
   errorSaturation: number | RelativeSaturation
+
+  /** Scale factor for dark-mode surface tones in OkL space. Default: 1.0.
+   *  Lower = deeper/blacker surfaces. 0.85 matches Google's 2025 phone spec.
+   *  Reasonable range: 0.75–1.25. */
+  darkSurfaceScale?: number
+  /** When true, surface-container-lowest in dark mode is pure black (#000000). */
+  darkLowestIsBlack?: boolean
 }
 
 // Saturation values calibrated from Google's CAM16 chroma values.
@@ -48,6 +55,8 @@ export const tonalSpot: SchemeConfig = {
   neutralVariantSaturation: 0.11,       // Google: chroma 5 * 1.7 ~ 8.5
   errorHue: 25,                         // Google: piecewise [0,3,13,...] -> [12,22,32,...]
   errorSaturation: 0.64,                // Google: chroma 60
+  darkSurfaceScale: 0.85,
+  darkLowestIsBlack: true,
 }
 
 export const vibrant: SchemeConfig = {
@@ -67,6 +76,8 @@ export const vibrant: SchemeConfig = {
   neutralVariantSaturation: 0.42,       // Google: chroma 28 * 1.29 ~ 36
   errorHue: 25,
   errorSaturation: 0.81,                // Google: chroma 80
+  darkSurfaceScale: 0.85,
+  darkLowestIsBlack: true,
 }
 
 export const expressive: SchemeConfig = {
@@ -86,6 +97,8 @@ export const expressive: SchemeConfig = {
   neutralVariantSaturation: 0.46,       // Google: chroma ~41 (18 * 2.3)
   errorHue: 25,
   errorSaturation: 0.68,                // Google: chroma 64
+  darkSurfaceScale: 0.85,
+  darkLowestIsBlack: true,
 }
 
 export const neutral: SchemeConfig = {
@@ -103,6 +116,8 @@ export const neutral: SchemeConfig = {
   neutralVariantSaturation: 0.040,      // Google: chroma 1.4 * 2.2 ~ 3
   errorHue: 25,
   errorSaturation: 0.55,                // Google: chroma 50
+  darkSurfaceScale: 0.85,
+  darkLowestIsBlack: true,
 }
 
 export const fidelity: SchemeConfig = {

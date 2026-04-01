@@ -11,7 +11,7 @@ import {
 import { createTonalPalette, createTonalPaletteFromChroma } from './tonal-palette.js'
 import type { TonalPalette } from './tonal-palette.js'
 import { TOKEN_DEFS } from './tokens.js'
-import type { PaletteRole, ContrastTarget } from './tokens.js'
+import type { TokenDef, PaletteRole, ContrastTarget } from './tokens.js'
 import { presets } from './presets.js'
 import type { SchemeConfig, RelativeSaturation } from './presets.js'
 
@@ -211,19 +211,41 @@ function buildPalettes(
   }
 }
 
+/** Resolve the OkL lightness for a token, applying darkSurfaceScale if applicable. */
+function resolveOkL(
+  def: TokenDef,
+  isDark: boolean,
+  darkSurfaceScale: number,
+  darkLowestIsBlack: boolean,
+): number {
+  const lstar100 = isDark ? def.darkTone : def.lightTone
+  let okL = lstarToOkL(lstar100)
+
+  // Apply dark surface scaling
+  if (isDark && def.isDarkSurface) {
+    if (def.isLowestSurface && darkLowestIsBlack) {
+      return 0 // pure black
+    }
+    okL *= darkSurfaceScale
+  }
+
+  return okL
+}
+
 /** Generate tokens for one mode. */
 function generateTokens(
   palettes: Record<PaletteRole, TonalPalette>,
   isDark: boolean,
   contrastLevel: number,
+  darkSurfaceScale: number,
+  darkLowestIsBlack: boolean,
 ): Record<string, string> {
   const result: Record<string, string> = {}
 
   // First pass: generate all tokens at base lightness
-  // Token tones are in L*/100 scale — convert to OkLab L for use with OkLCH palettes
   for (const def of TOKEN_DEFS) {
     const palette = palettes[def.palette]
-    const baseTone = lstarToOkL(isDark ? def.darkTone : def.lightTone)
+    const baseTone = resolveOkL(def, isDark, darkSurfaceScale, darkLowestIsBlack)
     result[def.name] = palette.hexAt(baseTone)
   }
 
@@ -236,7 +258,7 @@ function generateTokens(
     const targetRatio = interpolateContrast(def.contrastTarget, contrastLevel)
 
     const palette = palettes[def.palette]
-    const baseTone = lstarToOkL(isDark ? def.darkTone : def.lightTone)
+    const baseTone = resolveOkL(def, isDark, darkSurfaceScale, darkLowestIsBlack)
     const baseLch = palette.at(baseTone)
     const currentRatio = contrastRatio(baseLch, bgLch)
 
@@ -300,9 +322,11 @@ export function generatePalette(
     : undefined
 
   const palettes = buildPalettes(config, source, secondarySource)
+  const darkSurfaceScale = config.darkSurfaceScale ?? 1.0
+  const darkLowestIsBlack = config.darkLowestIsBlack ?? false
 
   return {
-    light: generateTokens(palettes, false, contrastLevel),
-    dark: generateTokens(palettes, true, contrastLevel),
+    light: generateTokens(palettes, false, contrastLevel, darkSurfaceScale, darkLowestIsBlack),
+    dark: generateTokens(palettes, true, contrastLevel, darkSurfaceScale, darkLowestIsBlack),
   }
 }

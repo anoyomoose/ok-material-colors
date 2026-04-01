@@ -81,6 +81,8 @@ interface SchemeConfig {
   neutralVariantSaturation: number | RelativeSaturation
   errorHue: number                  // 0 to 360 (absolute)
   errorSaturation: number | RelativeSaturation
+  darkSurfaceScale?: number         // 0.75 to 1.25, scales dark surface OkL. Default: 1.0
+  darkLowestIsBlack?: boolean       // surface-container-lowest dark = pure black
 }
 
 interface RelativeSaturation {

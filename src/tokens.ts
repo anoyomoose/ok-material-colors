@@ -20,6 +20,10 @@ export interface TokenDef {
   darkTone: number    // L* / 100
   background?: string
   contrastTarget?: ContrastTarget
+  /** Token is a dark-mode surface — its dark OkL is scaled by darkSurfaceScale. */
+  isDarkSurface?: boolean
+  /** Token is surface-container-lowest — forced to black when darkLowestIsBlack is true. */
+  isLowestSurface?: boolean
 }
 
 // Contrast curves matching Google's 2025 phone spec for TONAL_SPOT.
@@ -78,24 +82,22 @@ export const TOKEN_DEFS: TokenDef[] = [
   { name: 'on-error-container', palette: 'error', lightTone: 0.10, darkTone: 0.90, background: 'error-container', contrastTarget: CT_4_5 },
 
   // Background (2)
-  { name: 'background', palette: 'neutral', lightTone: 0.98, darkTone: 0.06 },
+  { name: 'background', palette: 'neutral', lightTone: 0.98, darkTone: 0.06, isDarkSurface: true },
   { name: 'on-background', palette: 'neutral', lightTone: 0.10, darkTone: 0.90, background: 'background', contrastTarget: CT_9 },
 
-  // Surface (12) — using 2021 base tones (L*) which most variants fall back to.
-  // 2025 phone overrides (TONAL_SPOT only) are slightly darker; the difference
-  // is 1-2 L* units and not visually significant. Using 2021 values ensures
-  // consistent behavior across all scheme variants.
-  { name: 'surface', palette: 'neutral', lightTone: 0.98, darkTone: 0.06 },
+  // Surface (12) — base tones from 2021 spec (L*). Variants that want deeper dark
+  // surfaces set darkSurfaceScale < 1.0 which multiplies these OkL values.
+  { name: 'surface', palette: 'neutral', lightTone: 0.98, darkTone: 0.06, isDarkSurface: true },
   { name: 'on-surface', palette: 'neutral', lightTone: 0.10, darkTone: 0.90, background: 'surface', contrastTarget: CT_9 },
-  { name: 'surface-variant', palette: 'neutralVariant', lightTone: 0.90, darkTone: 0.30 },
+  { name: 'surface-variant', palette: 'neutralVariant', lightTone: 0.90, darkTone: 0.30, isDarkSurface: true },
   { name: 'on-surface-variant', palette: 'neutralVariant', lightTone: 0.30, darkTone: 0.80, background: 'surface', contrastTarget: CT_4_5 },
-  { name: 'surface-dim', palette: 'neutral', lightTone: 0.87, darkTone: 0.06 },
-  { name: 'surface-bright', palette: 'neutral', lightTone: 0.98, darkTone: 0.24 },
-  { name: 'surface-container-lowest', palette: 'neutral', lightTone: 1.00, darkTone: 0.04 },
-  { name: 'surface-container-low', palette: 'neutral', lightTone: 0.96, darkTone: 0.10 },
-  { name: 'surface-container', palette: 'neutral', lightTone: 0.94, darkTone: 0.12 },
-  { name: 'surface-container-high', palette: 'neutral', lightTone: 0.92, darkTone: 0.17 },
-  { name: 'surface-container-highest', palette: 'neutral', lightTone: 0.90, darkTone: 0.22 },
+  { name: 'surface-dim', palette: 'neutral', lightTone: 0.87, darkTone: 0.06, isDarkSurface: true },
+  { name: 'surface-bright', palette: 'neutral', lightTone: 0.98, darkTone: 0.24, isDarkSurface: true },
+  { name: 'surface-container-lowest', palette: 'neutral', lightTone: 1.00, darkTone: 0.04, isDarkSurface: true, isLowestSurface: true },
+  { name: 'surface-container-low', palette: 'neutral', lightTone: 0.96, darkTone: 0.10, isDarkSurface: true },
+  { name: 'surface-container', palette: 'neutral', lightTone: 0.94, darkTone: 0.12, isDarkSurface: true },
+  { name: 'surface-container-high', palette: 'neutral', lightTone: 0.92, darkTone: 0.17, isDarkSurface: true },
+  { name: 'surface-container-highest', palette: 'neutral', lightTone: 0.90, darkTone: 0.22, isDarkSurface: true },
   { name: 'surface-tint', palette: 'primary', lightTone: 0.40, darkTone: 0.80 },
 
   // Outline (2)
